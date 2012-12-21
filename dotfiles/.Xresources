@@ -1,0 +1,13 @@
+! FONTS
+! Interesting fonts : Droid, Monaco, Terminus, Dina
+! -*-lucidatypewriter-medium-*-*-*-10-*-*-*-*-*-*-*
+! -*-lucidatypewriter-bold-*-*-*-10-*-*-*-*-*-*-*
+
+#define FONT xft:Droid Sans Mono:style=Regular:pixelsize=12
+!#define FONT_BOLD!
+
+Emacs*font:Droid Sans Mono:style=Regular:pixelsize=12
+!-unknown-DejaVu Sans Mono-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1
+
+#include "~/conf/look-zenburn.xrdb"
+#include "~/conf/urxvt.xrdb"
