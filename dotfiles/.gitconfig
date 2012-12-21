@@ -1,0 +1,75 @@
+################################################################################
+# Git configuration file                                                       #
+# Pierre-Luc Perrier <pluc@the-pluc.net>                                       #
+# git@github.com:kode9/conf.git                                                #
+#                                                                              #
+# I didn't write most of this, picked up here and there on internet.           #
+# Some good ones : https://git.wiki.kernel.org/index.php/Aliases               #
+#                                                                              #
+# Usage :                                                                      #
+# 	- Complete the [user] section                                          #
+#	- Eventually complete the [github] section                             #
+#	- Eventually change the editor if you don't use emacs (bad idea :p)    #
+#	- Put this file in your ~                                              #
+################################################################################
+
+[user]
+	name =
+	email =
+[github]
+	user =
+	token =
+[core]
+	pager = less -RS -+FX
+	editor = emacsclient
+	whitespace = fix
+	# Default .gitignore. You can take mine, or change this if you have your own
+	excludesfile = ~/.gitignore-global
+[color]
+	ui = always
+[diff]
+	renamelimit = 0
+[push]
+	default = current
+[alias]
+	# Shortcuts
+	s = status
+	ci = commit
+	br = branch
+	co = checkout
+    	df = diff
+	who = shortlog -s --
+    	amend = commit --amend
+	staged = diff --cached
+	patch = add --patch
+	l = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(bold yellow)%d \
+	%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	ll = log --stat --graph
+	pop = stash pop
+	# Diff with just modified files and stats
+	ds = diff --stat -r
+	# What commits from the last command
+	new = !sh -c 'git log $1@{1}..$1@{0} "$@"'
+	# Serve repo on the spot
+	serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
+	# Find someone and display full name / email address
+	whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+	# Open all unmerged files in Emacs
+	edit-unmerged = "!f() { git ls-fil&es -m | cut -f2 | sort -u ; }; emacsclient -n `f`"
+        add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+	# Add and commit on the fly, chunck by chunck
+	record = ! sh -c '(git add -p -- $@ && git commit) || git reset' --
+	# Interactive rebase with autosquash/fixup
+	# http://technosorcery.net/blog/2010/02/07/fun-with-the-upcoming-1-7-release-of-git-rebase---interactive---autosquash/
+	fixup = !sh -c 'git commit -m \"fixup! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+	squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+	ri = rebase --interactive --autosquash
+[branch "master"]
+	merge = refs/heads/master
+	remote = origin
+[branch]
+	autosetuprebase = always
+[svn]
+	rmdir = 1
+[log]
+	decorate=full
