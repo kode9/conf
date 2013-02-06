@@ -145,12 +145,13 @@ This is useful if you just want to define a dictionary/keywords source."
 (add-to-list 'auto-mode-alist '("\\.F90" . f90-mode))
 (add-to-list 'auto-mode-alist '("\\.qrc" . xml-mode))
 (add-to-list 'auto-mode-alist '("\\.less" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl" . html-mode))
 
 ;; Google
 (require 'google-search)
 ;; Set browser to Chromium
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium-browser")
+      browse-url-generic-program "chromium")
 
 ;; keys
 (global-set-key [(control c) (c)] 'comment-region)
