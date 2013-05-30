@@ -65,30 +65,59 @@
  '(backup-directory-alist '((".*" . "~/.emacs.d/backups/"))))
 
 ;; hooks
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(defun clean-buffer()
+  "Remove trailing whitespaces and tabs"
+  (interactive)
+  (delete-trailing-whitespace)
+  (untabify (point-min) (point-max)))
+
+(defun iwb()
+  "indent whole buffer"
+  (interactive)
+  (indent-region (point-min) (point-max) nil))
+
+(defun dev-hooks()
+  "Hooks for dev files"
+  (set-buffer-file-coding-system 'utf-8-unix)
+  (clean-buffer)
+  (copyright-update))
+
+(defun add-local-dev-hooks()
+  "See dev-hooks"
+  (add-hook 'before-save-hook 'iwb nil t))
+
+;; Clean for any files
+(add-hook 'before-save-hook 'clean-buffer)
+;; For dev
+(add-hook 'c-mode-common-hook 'add-local-dev-hooks)
+(add-hook 'cmake-mode-hook 'add-local-dev-hooks)
+
+;; Better SQL indentation
+(eval-after-load "sql"
+  (load-library "sql-indent"))
 
 ;; Scilab mode
 (load "scilab")
-					;(setq scilab-mode-hook '(lambda () (setq fill-column 74)))
+; (setq scilab-mode-hook '(lambda () (setq fill-column 74)))
 
 ;; csharp
-					;(require 'csharp-mode)
+; (require 'csharp-mode)
 
 ;; Autocomplete
-					; Andy Stewart init
+; Andy Stewart init
 (require 'init-auto-complete)
 
-					; default init
+; default init
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
 (ac-config-default)
 
-					; clang
+; clang
 (require 'auto-complete-clang)
 (setq ac-quick-help-delay 0.8)
 ;; (ac-set-trigger-key "TAB")
 ;; (define-key ac-mode-map  [(control tab)] 'auto-complete)
-					; (define-key ac-mode-map  [(control tab)] 'auto-complete)
+; (define-key ac-mode-map  [(control tab)] 'auto-complete)
 
 (add-to-list 'ac-sources 'ac-source-dictionary)
 (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
@@ -122,7 +151,7 @@ This is useful if you just want to define a dictionary/keywords source."
    "bitand" "char" "default" "enum" "for" "long" "operator" "register"
    "static" "throw" "union" "wchar_t" "bitor" "class" "delete" "explicit"
    "friend" "mutable" "or" "reinterpret_cast" "static_cast" "true"
-   "unsigned" "while" "nullptr"))
+   "unsigned" "while" "nullptr" "constexpr"))
 
 (defun ac-c++-keywords-setup ()
   (push 'ac-source-c++-keywords ac-sources))
@@ -141,11 +170,17 @@ This is useful if you just want to define a dictionary/keywords source."
 (add-to-list 'auto-mode-alist '("SConscript" . python-mode))
 (add-to-list 'auto-mode-alist '("\\(\\.sci$\\|\\.sce\\)" . scilab-mode))
 (add-to-list 'auto-mode-alist '("\\.axl" . xml-mode)) ; Axel modeler
-(add-to-list 'auto-mode-alist '("\\(\\.mdwn$\\|\\.mdml\\)" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\(\\.mdwn$\\|\\.mdml\\|\\.md\\)" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.F90" . f90-mode))
 (add-to-list 'auto-mode-alist '("\\.qrc" . xml-mode))
 (add-to-list 'auto-mode-alist '("\\.less" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.h" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.hpp" . c++-mode))
+
+(add-to-list 'load-path '"~/conf/emacs/qml-mode")
+(require 'qml-mode)
+(add-to-list 'auto-mode-alist '("\\.qml" . qml-mode))
 
 ;; Google
 (require 'google-search)
@@ -154,8 +189,8 @@ This is useful if you just want to define a dictionary/keywords source."
       browse-url-generic-program "chromium")
 
 ;; keys
-(global-set-key [(control c) (c)] 'comment-region)
-(global-set-key [(control c) (v)] 'uncomment-region)
+(global-set-key [(control c) (c)] 'comment-or-uncomment-region)
+;; (global-set-key [(control c) (v)] 'uncomment-region)
 (global-set-key [(control c) (x)] 'compile)
 (global-set-key [(meta g)] 'goto-line)
 (global-set-key [(control x) (control k)] 'kill-some-buffers)
@@ -167,11 +202,11 @@ This is useful if you just want to define a dictionary/keywords source."
 ;; Close the compilation window if there was no error at all.
 (setq compilation-exit-message-function
       (lambda (status code msg)
-	;; If M-x compile exists with a 0
-	(when (and (eq status 'exit) (zerop code))
-	  ;; then bury the *compilation* buffer, so that C-x b doesn't go there
-  	  (bury-buffer "*compilation*")
-  	  ;; and return to whatever were looking at before
-  	  (replace-buffer-in-windows "*compilation*"))
-	;; Always return the anticipated result of compilation-exit-message-function
-  	(cons msg code)))
+        ;; If M-x compile exists with a 0
+        (when (and (eq status 'exit) (zerop code))
+          ;; then bury the *compilation* buffer, so that C-x b doesn't go there
+          (bury-buffer "*compilation*")
+          ;; and return to whatever were looking at before
+          (replace-buffer-in-windows "*compilation*"))
+        ;; Always return the anticipated result of compilation-exit-message-function
+        (cons msg code)))
