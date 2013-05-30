@@ -55,7 +55,7 @@
 	# Find someone and display full name / email address
 	whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
 	# Open all unmerged files in Emacs
-	edit-unmerged = "!f() { git ls-fil&es -m | cut -f2 | sort -u ; }; emacsclient -n `f`"
+	edit-unmerged = "!f() { git ls-files -m | cut -f2 | sort -u ; }; emacsclient -n `f`"
         add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
 	# Add and commit on the fly, chunck by chunck
 	record = ! sh -c '(git add -p -- $@ && git commit) || git reset' --
