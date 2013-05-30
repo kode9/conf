@@ -1,0 +1,3 @@
+[submodule "emacs/qml-mode"]
+	path = emacs/qml-mode
+	url = git://github.com/cataska/qml-mode.git
