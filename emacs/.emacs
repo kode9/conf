@@ -21,6 +21,7 @@
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
 
+(add-to-list 'load-path '"~/.emacs.d/elpa/color-theme-20080305.34/")
 ;; zenburn color theme
 (require 'zenburn)
 (color-theme-zenburn)
@@ -107,6 +108,7 @@
 ;;; Better SQL indentation
 (eval-after-load "sql" (load-library "sql-indent"))
 ;;; Yasnippet
+(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-20131224.143")
 (add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -215,15 +217,3 @@
 (global-set-key [(control c) (s)] 'google-search-selection)
 (global-set-key [(control c) (d)] 'find-tag)
 (global-set-key [(control c) (f)] 'find-tag-other-window)
-
-;; Close the compilation window if there was no error at all.
-(setq compilation-exit-message-function
-      (lambda (status code msg)
-        ;; If M-x compile exists with a 0
-        (when (and (eq status 'exit) (zerop code))
-          ;; then bury the *compilation* buffer, so that C-x b doesn't go there
-          (bury-buffer "*compilation*")
-          ;; and return to whatever were looking at before
-          (replace-buffer-in-windows "*compilation*"))
-        ;; Always return the anticipated result of compilation-exit-message-function
-        )))
