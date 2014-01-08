@@ -1,3 +1,6 @@
 [submodule "emacs/qml-mode"]
 	path = emacs/qml-mode
 	url = git://github.com/cataska/qml-mode.git
+[submodule "emacs/clean-aindent"]
+	path = emacs/clean-aindent
+	url = https://github.com/pmarinov/clean-aindent
