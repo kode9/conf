@@ -9,11 +9,49 @@
 (add-to-list 'load-path '"~/conf/emacs/")
 (add-to-list 'load-path '"~/.emacs.d/")
 
-;; start emacs-client server
-(server-start)
+(load-file "~/conf/emacs/user.el")
 
-(setq user-full-name "")
-(setq user-email "")
+;; Custom variables
+(custom-set-variables
+ '(tool-bar-mode nil)                   ; Turn off the toolbar
+ '(menu-bar-mode nil)                   ; Turn off the menubar
+ '(scroll-bar-mode nil)                 ; Turn off the scrollbar
+ '(display-time-mode nil)               ; Do not show date and time
+ '(show-paren-mode t)                   ; Highlight parenthesis
+ '(mouse-avoidance-mode 'cat-and-mouse) ; Avoid cursor
+ '(display-time-mode nil)               ; Hide time in mode-line
+ '(line-number-mode t)                  ; Show line number in mode-line
+ '(column-number-mode t)                ; Show column number in mode-line
+ '(size-indication-mode t)              ; Show buffer size in mode-line
+ '(display-battery-mode nil)            ; Hide battery information in mode-line
+ '(show-trailing-whitespace t)          ; Trailing whitespaces
+ '(python-python-command "python3")     ; Use python3 by default
+ '(winner-mode t)                       ; Used for autoclose
+ '(display-time-day-and-date)
+ '(display-time-24hr-format)
+ '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+ '(backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
+ )
+
+(setq
+ inhibit-startup-screen t           ; Do not show the welcome message
+ initial-scratch-message nil
+ message-log-max nil                ; Disable off message buffer
+ visible-bell nil                   ; Get rid of bells
+ ring-bell-function 'ignore
+ frame-title-format "Emacs : %f"    ; Frame title format
+ savehist-file "~/.emacs.d/history" ; History file
+ vc-follow-symlinks t               ; Automatically follow symlinks to files under CVS
+ )
+
+;; Kill disable message buffer
+(kill-buffer "*Messages*")
+
+;; Save history beetween sessions
+(savehist-mode t)
+
+;; Start emacs-client server
+(server-start)
 
 ;; Package archive
 (require 'package)
@@ -21,54 +59,85 @@
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
 
+;; Theme
 (add-to-list 'load-path '"~/.emacs.d/elpa/color-theme-20080305.34/")
-;; zenburn color theme
+;;; Zenburn color theme
 (require 'zenburn)
 (color-theme-zenburn)
+;;; Solarized
 ;; (add-to-list 'custom-theme-load-path '"~/usr/src/emacs-color-theme-solarized/")
 ;; (load-theme 'solarized-dark t)
 ;; (load-theme 'solarized-light t)
 
-;; do not show the welcome message
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message nil)
-
-;; shut off message buffer
-(setq message-log-max nil)
-;; (kill-buffer "*Messages*")
-
-;; get rid of bells
-(setq visible-bell nil)
-(setq ring-bell-function 'ignore)
-
-;; frame title
-(setq frame-title-format "Emacs : %f")
+;; Identify multiple buffers with the same file name
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
-;; Save history beetween sessions
-(setq savehist-file "~/.emacs.d/history")
-(savehist-mode t)
+;; Show region size and maximum column number in mode-line
+;;; http://www.emacswiki.org/emacs/modeline-posn.el
+;;; Does not work with powerline
+(add-to-list 'load-path '"~/.emacs.d/elpa/modeline-posn-20131227.140/")
+(require 'modeline-posn)
+(set 'modelinepos-column-limit 100)
 
-;; custom variables
-(custom-set-variables
- '(tool-bar-mode nil)                   ; turn off the toolbar
- '(menu-bar-mode nil)                   ; turn off the menubar
- '(scroll-bar-mode nil)                 ; turn off the scrollbar
- '(line-number-mode t)                  ; show line number
- '(column-number-mode t)                ; show column number
- '(display-time-mode nil)               ; do not show date and time
- '(show-paren-mode t)                   ; highlight parenthesis
- '(size-indication-mode t)              ; show buffer size
- '(mouse-avoidance-mode 'cat-and-mouse) ; avoid cursor
- '(display-time-mode nil)               ; do not display time
- '(show-trailing-whitespace t)          ; trailing whitespaces
- '(python-python-command "python3")     ; use python3 by default
- '(winner-mode t)                       ; used for autoclose
- '(display-time-day-and-date)
- '(display-time-24hr-format)
- '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
- '(backup-directory-alist '((".*" . "~/.emacs.d/backups/"))))
+(defun powerline-pluc-theme ()
+  "Setup the default mode-line."
+  (interactive)
+  (setq-default mode-line-format
+                '("%e"
+                  (:eval
+                   (let* ((active (powerline-selected-window-active))
+                          (mode-line (if active 'mode-line 'mode-line-inactive))
+                          (face1 (if active 'powerline-active1 'powerline-inactive1))
+                          (face2 (if active 'powerline-active2 'powerline-inactive2))
+                          (separator-left (intern (format "powerline-%s-%s"
+                                                          powerline-default-separator
+                                                          (car powerline-default-separator-dir))))
+                          (separator-right (intern (format "powerline-%s-%s"
+                                                           powerline-default-separator
+                                                           (cdr powerline-default-separator-dir))))
+                          (lhs (list (powerline-buffer-id nil 'l)
+                                     (when (and (boundp 'which-func-mode) which-func-mode)
+                                       (powerline-raw which-func-format nil 'l))
+                                     (powerline-raw " ")
+                                     (funcall separator-left mode-line face1)
+                                     (when (boundp 'erc-modified-channels-object)
+                                       (powerline-raw erc-modified-channels-object face1 'l))
+                                     (funcall separator-left face1 face2)
+                                     (powerline-raw "%l ϟ %c" face2 'l)
+                                     (funcall separator-left face2 face1)
+                                     (powerline-major-mode face1 'l)
+                                     (powerline-process face1)
+                                     (powerline-minor-modes face1 'l)
+                                     (powerline-narrow face1 'l)
+                                     (powerline-raw " " face1)
+                                     (funcall separator-left face1 face2)
+                                     (powerline-vc face2 'r)))
+                          (rhs (list (powerline-raw global-mode-string face2 'r)
+                                     (funcall separator-right face2 face1)
+                                     (funcall separator-right face1 mode-line)
+                                     (powerline-raw " ")
+                                     (powerline-raw "%6p" nil 'r)
+                                     (powerline-hud face2 face1))))
+                     (concat (powerline-render lhs)
+                             (powerline-fill face2 (powerline-width rhs))
+                             (powerline-render rhs)))))))
+
+;; Powerline (custom mode-line)
+;;; https://github.com/milkypostman/powerline
+(add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20131126.1817/")
+(require 'powerline)
+(powerline-pluc-theme)
+;; (powerline-default-theme)
+
+;; http://www.emacswiki.org/emacs/AutoIndentMode
+(add-to-list 'load-path '"~/.emacs.d/elpa/auto-indent-mode-20131220.1220/")
+(setq auto-indent-on-visit-file t)
+(require 'auto-indent-mode)
+(auto-indent-global-mode)
+;; https://github.com/pmarinov/clean-aindent
+(add-to-list 'load-path '"~/conf/emacs/clean-aindent")
+(require 'clean-aindent)
 
 ;; Major modes
 ;;; Path
@@ -217,3 +286,16 @@
 (global-set-key [(control c) (s)] 'google-search-selection)
 (global-set-key [(control c) (d)] 'find-tag)
 (global-set-key [(control c) (f)] 'find-tag-other-window)
+
+;; Close the compilation window if there was no error at all.
+(setq compilation-exit-message-function
+      (lambda (status code msg)
+        ;; If M-x compile exists with a 0
+        (when (and (eq status 'exit) (zerop code))
+          ;; then bury the *compilation* buffer, so that C-x b doesn't go there
+          ;; (bury-buffer "*compilation*")
+          ;; and return to whatever were looking at before
+          ;; (replace-buffer-in-windows "*compilation*"))
+          ;; Always return the anticipated result of compilation-exit-message-function
+          ;; (cons msg code)
+          )))
