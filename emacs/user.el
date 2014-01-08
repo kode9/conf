@@ -1,4 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Just some user informations for emacs.                                      ;;
+;; Will be loaded by top-level emacs configuration                             ;;
+;; Pierre-Luc Perrier <pluc@the-pluc.net>                                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq
- user-full-name "Pierre-Luc Perrier"
- user-email "pluc@the-pluc.net"
+ user-full-name "" ; Complete here
+ user-email ""     ; and here
  )

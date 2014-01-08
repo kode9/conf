@@ -2,7 +2,7 @@
 ;; Emacs configuration file                                                    ;;
 ;; Pierre-Luc Perrier <pluc@the-pluc.net>                                      ;;
 ;;                                                                             ;;
-;; Copy this in your home                                                      ;;
+;; Copy this in your home and custom user.el                                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; conf path
