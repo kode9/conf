@@ -1,22 +1,9 @@
-! FONTS
-! Interesting fonts : Droid, Monaco, Terminus, Dina
-! -*-lucidatypewriter-medium-*-*-*-10-*-*-*-*-*-*-*
-! -*-lucidatypewriter-bold-*-*-*-10-*-*-*-*-*-*-*
-
-#define FONT xft:Droid Sans Mono:style=Regular:pixelsize=12
-!#define FONT_BOLD!
+Xcursor.theme: whiteglass
 
 Emacs*font:Droid Sans Mono:style=Regular:pixelsize=12
-!-unknown-DejaVu Sans Mono-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1
+
+#define FONT xft:Dejavu Sans Mono:pixelsize=12
 
 #include "/home/pluc/conf/look-zenburn.xrdb"
+! #include "/home/pluc/conf/look-solarized.xrdb"
 #include "/home/pluc/conf/urxvt.xrdb"
-
-URxvt.perl-ext-common:  default,tabbed
-URxvt.tabbed.tabbar-fg: 2
-URxvt.tabbed.tabbar-bg: 0
-URxvt.tabbed.tab-fg:    3
-URxvt.tabbed.tab-bg:    0
-
-URxvt.font: xft:Dejavu Sans Mono:pixelsize=12
-URxvt.saveLines:65000

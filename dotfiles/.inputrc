@@ -1,9 +1,28 @@
 # Disable bell on tab completion
 set bell-style none
 
-# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
-$if term=rxvt-unicode
+set meta-flag on
+set input-meta on
+set convert-meta off
+set output-meta on
+
+# mappings
+"\e[7~": beginning-of-line
 "\e[8~": end-of-line
 "\eOc": forward-word
 "\eOd": backward-word
-$endif
+
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+"\e[5~": beginning-of-history
+"\e[6~": end-of-history
+"\e[3~": delete-char
+"\e[2~": quoted-insert
+"\e[5C": forward-word
+"\e[5D": backward-word
+"\e\e[C": forward-word
+"\e\e[D": backward-word
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
