@@ -36,16 +36,13 @@
 (setq
  inhibit-startup-screen t           ; Do not show the welcome message
  initial-scratch-message nil
- message-log-max nil                ; Disable off message buffer
+ message-log-max 50                 ; Disable off message buffer
  visible-bell nil                   ; Get rid of bells
  ring-bell-function 'ignore
  frame-title-format "Emacs : %f"    ; Frame title format
  savehist-file "~/.emacs.d/history" ; History file
  vc-follow-symlinks t               ; Automatically follow symlinks to files under CVS
  )
-
-;; Kill disable message buffer
-(kill-buffer "*Messages*")
 
 ;; Save history beetween sessions
 (savehist-mode t)
