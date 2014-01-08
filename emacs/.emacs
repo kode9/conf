@@ -69,17 +69,51 @@
  '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
  '(backup-directory-alist '((".*" . "~/.emacs.d/backups/"))))
 
+;; View, stage and revert Git changes straight from the buffer.
+;;; https://github.com/nonsequitur/git-gutter-plus
+(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20131230.729/")
+(add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20130918.435")
+(require 'git-gutter+)
+(global-git-gutter+-mode t)
+
+;; Autoscoll compilation buffer and stop on first error
+(set 'compilation-scroll-output 'first-error)
+;; Skip warnings when jumping between errors
+(set 'compilation-skip-threshold 2)
+
+;; Highlights current line in compilation within another buffer
+;;; Actually it's a bit annoying...
+;; (add-to-list 'load-path '"~/.emacs.d/elpa/fm-20130612.1")
+;; (require 'fm)
+;; (add-hook 'compilation-mode-hook (lambda () (fm-start)))
+;; (remove-hook 'compilation-mode-hook (lambda () (fm-start)))
+
+;; Shorten long file-name targets
+;;; https://github.com/lewang/scf-mode
+;;; Seems to work in grep, but not in compile :(
+(add-to-list 'load-path '"~/.emacs.d/elpa/scf-mode-20111202.707/")
+(autoload 'scf-mode "scf-mode" "SCF Mode" t)
+(add-hook 'compilation-mode-hook (lambda () (scf-mode t)))
+
+;; Stop asking yes/no before compile when a compilation is already running
+;;; ftp://download.tuxfamily.org/user42/compilation-always-kill.el
+(autoload 'compilation-always-kill-mode "compilation-always-kill" nil t)
+(compilation-always-kill-mode t)
+
 ;; Major modes
 ;;; Path
 (add-to-list 'load-path '"~/conf/emacs/qml-mode")
+(autoload 'glsl-mode "glsl-mode" nil t)
 ;;; Load
 (autoload 'qml-mode "qml-mode" "QML mode" t)
 (autoload 'markdown-mode "markdown-mode" "Markdown mode" t)
 (autoload 'cmake-mode "cmake-mode" "Cmake Mode." t)
+(autoload 'cuda-mode "cuda-mode" "Cuda Mode." t)
 ;;;; Filename patterns
 (add-to-list 'auto-mode-alist '("\\.qml\\'" . qml-mode))
 (add-to-list 'auto-mode-alist '("\\.\\(markdown\\|md\\|mdwn\\|mdml\\)\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\CMakeLists.txt\\'" . cmake-mode))
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("SConstruct\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("SConscript\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.\\(sci\\|sce\\)\\'" . scilab-mode))
@@ -93,6 +127,8 @@
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 (add-to-list 'auto-mode-alist '("\\.xrdb\\'" . conf-xdefaults-mode))
 (add-to-list 'auto-mode-alist '(".*_EDITMSG\\'" . log-entry-mode)) ; Git commit
+(add-to-list 'auto-mode-alist '("\\.\\(glsl\\|vert\\|frag\\|geom\\|vs\\|fs\\|gs\\)\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . cuda-mode))
 
 ;; Minor modes
 (autoload 'align-string "align-string" "Align string." t)
@@ -108,6 +144,7 @@
 (eval-after-load "sql" (load-library "sql-indent"))
 ;;; Yasnippet
 (add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
+(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet")
 (require 'yasnippet)
 (yas-global-mode 1)
 ;;; Autocomplete
@@ -217,13 +254,13 @@
 (global-set-key [(control c) (f)] 'find-tag-other-window)
 
 ;; Close the compilation window if there was no error at all.
-(setq compilation-exit-message-function
-      (lambda (status code msg)
-        ;; If M-x compile exists with a 0
-        (when (and (eq status 'exit) (zerop code))
-          ;; then bury the *compilation* buffer, so that C-x b doesn't go there
-          (bury-buffer "*compilation*")
-          ;; and return to whatever were looking at before
-          (replace-buffer-in-windows "*compilation*"))
-        ;; Always return the anticipated result of compilation-exit-message-function
-        )))
+;; (setq compilation-exit-message-function
+;;       (lambda (status code msg)
+;;         ;; If M-x compile exists with a 0
+;;         (when (and (eq status 'exit) (zerop code))
+;;           ;; then bury the *compilation* buffer, so that C-x b doesn't go there
+;;           (bury-buffer "*compilation*")
+;;           ;; and return to whatever were looking at before
+;;           ;; (replace-buffer-in-windows "*compilation*"))
+;;         ;; Always return the anticipated result of compilation-exit-message-function
+;;         )))
