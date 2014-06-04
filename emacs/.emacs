@@ -138,8 +138,10 @@
 
 ;; View, stage and revert Git changes straight from the buffer.
 ;;; https://github.com/nonsequitur/git-gutter-plus
-(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20131230.729/")
+(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20131230.729")
+(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20140313.1504")
 (add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20130918.435")
+(add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20140205.802")
 (require 'git-gutter+)
 (global-git-gutter+-mode t)
 
