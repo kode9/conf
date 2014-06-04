@@ -104,7 +104,7 @@ URxvt.urgentOnBell: true
 
 ! Set MWM hints to request a borderless window, i.e. if honoured by
 ! the WM, the rxvt-unicode window will not have window decorations;
-URxvt.borderLess: true
+URxvt.borderLess: false
 
 ! Specifies the terminal type name to be set in the TERM environment variable; option -tn.
 ! URxvt.termName: rxvt-unicode-256color
