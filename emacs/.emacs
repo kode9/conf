@@ -74,6 +74,7 @@
 ;;; http://www.emacswiki.org/emacs/modeline-posn.el
 ;;; Does not work with powerline
 (add-to-list 'load-path '"~/.emacs.d/elpa/modeline-posn-20131227.140/")
+(add-to-list 'load-path '"~/.emacs.d/elpa/modeline-posn-20140121.553/")
 (require 'modeline-posn)
 (set 'modelinepos-column-limit 100)
 
@@ -123,12 +124,14 @@
 ;; Powerline (custom mode-line)
 ;;; https://github.com/milkypostman/powerline
 (add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20131126.1817/")
+(add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20140516.2128/")
 (require 'powerline)
 (powerline-pluc-theme)
 ;; (powerline-default-theme)
 
 ;; http://www.emacswiki.org/emacs/AutoIndentMode
 (add-to-list 'load-path '"~/.emacs.d/elpa/auto-indent-mode-20131220.1220/")
+(add-to-list 'load-path '"~/.emacs.d/elpa/auto-indent-mode-20140505.655/")
 (setq auto-indent-on-visit-file t)
 (require 'auto-indent-mode)
 (auto-indent-global-mode)
@@ -140,6 +143,7 @@
 ;;; https://github.com/nonsequitur/git-gutter-plus
 (add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20131230.729")
 (add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20140313.1504")
+(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20140605.520")
 (add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20130918.435")
 (add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20140205.802")
 (require 'git-gutter+)
@@ -212,9 +216,10 @@
 ;;; Better SQL indentation
 (eval-after-load "sql" (load-library "sql-indent"))
 ;;; Yasnippet
-(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-20131224.143")
-(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
 (add-to-list 'load-path "~/.emacs.d/elpa/yasnippet")
+(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
+(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-20131224.143")
+(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-20140514.1649")
 (require 'yasnippet)
 (yas-global-mode 1)
 ;;; Autocomplete
