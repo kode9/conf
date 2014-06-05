@@ -125,8 +125,8 @@
 ;;; https://github.com/milkypostman/powerline
 (add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20131126.1817/")
 (add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20140516.2128/")
-(require 'powerline)
-(powerline-pluc-theme)
+;(require 'powerline)
+;(powerline-pluc-theme)
 ;; (powerline-default-theme)
 
 ;; http://www.emacswiki.org/emacs/AutoIndentMode
@@ -174,14 +174,15 @@
 (compilation-always-kill-mode t)
 
 ;; Major modes
-;;; Path
+;;; Load
 (add-to-list 'load-path '"~/conf/emacs/qml-mode")
 (autoload 'glsl-mode "glsl-mode" nil t)
-;;; Load
 (autoload 'qml-mode "qml-mode" "QML mode" t)
 (autoload 'markdown-mode "markdown-mode" "Markdown mode" t)
 (autoload 'cmake-mode "cmake-mode" "Cmake Mode." t)
 (autoload 'cuda-mode "cuda-mode" "Cuda Mode." t)
+(add-to-list 'load-path '"~/.emacs.d/elpa/apache-mode-20080905.553/")
+(autoload 'apache-mode "apache-mode" nil t)
 ;;;; Filename patterns
 (add-to-list 'auto-mode-alist '("\\.qml\\'" . qml-mode))
 (add-to-list 'auto-mode-alist '("\\.\\(markdown\\|md\\|mdwn\\|mdml\\)\\'" . markdown-mode))
@@ -202,6 +203,11 @@
 (add-to-list 'auto-mode-alist '(".*_EDITMSG\\'" . log-entry-mode)) ; Git commit
 (add-to-list 'auto-mode-alist '("\\.\\(glsl\\|vert\\|frag\\|geom\\|vs\\|fs\\|gs\\)\\'" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.cu\\'" . cuda-mode))
+(add-to-list 'auto-mode-alist '("\\.htaccess\\'"   . apache-mode))
+(add-to-list 'auto-mode-alist '("httpd\\.conf\\'"  . apache-mode))
+(add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
+(add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
+(add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
 
 ;; Minor modes
 (autoload 'align-string "align-string" "Align string." t)
