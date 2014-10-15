@@ -52,6 +52,7 @@
 
 ;; Package archive
 (require 'package)
+(package-initialize) ;; initialisation de package
 ;;; Additional packages http://marmalade-repo.org/
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
@@ -176,6 +177,7 @@
 ;; Major modes
 ;;; Load
 (add-to-list 'load-path '"~/conf/emacs/qml-mode")
+(add-to-list 'load-path '"~/.emacs.d/elpa/haxe-mode")
 (autoload 'glsl-mode "glsl-mode" nil t)
 (autoload 'qml-mode "qml-mode" "QML mode" t)
 (autoload 'markdown-mode "markdown-mode" "Markdown mode" t)
@@ -183,6 +185,7 @@
 (autoload 'cuda-mode "cuda-mode" "Cuda Mode." t)
 (add-to-list 'load-path '"~/.emacs.d/elpa/apache-mode-20080905.553/")
 (autoload 'apache-mode "apache-mode" nil t)
+(autoload 'haxe-mode "haxe-mode" "Haxe Mode." t)
 ;;;; Filename patterns
 (add-to-list 'auto-mode-alist '("\\.qml\\'" . qml-mode))
 (add-to-list 'auto-mode-alist '("\\.\\(markdown\\|md\\|mdwn\\|mdml\\)\\'" . markdown-mode))
@@ -208,6 +211,8 @@
 (add-to-list 'auto-mode-alist '("srm\\.conf\\'"    . apache-mode))
 (add-to-list 'auto-mode-alist '("access\\.conf\\'" . apache-mode))
 (add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\.lk\\'" . js-mode)) ; LeekScript (LeekWars)
+(add-to-list 'auto-mode-alist '("\\.hx\\'" . haxe-mode))
 
 ;; Minor modes
 (autoload 'align-string "align-string" "Align string." t)
@@ -290,32 +295,35 @@
 ;; (global-auto-complete-mode t)
 
 ;; Custom hooks
-(defun clean-buffer()
-  "Remove trailing whitespaces and tabs"
+(defun dtw()
+  "Delete trailing whitespaces"
   (interactive)
-  (delete-trailing-whitespace)
-  (untabify (point-min) (point-max)))
+  (delete-trailing-whitespace))
 
 (defun iwb()
-  "indent whole buffer"
+  "Indent whole buffer, untabify, and set UTF8"
   (interactive)
-  (indent-region (point-min) (point-max) nil))
+  (indent-region (point-min) (point-max) nil)
+  (set-buffer-file-coding-system 'utf-8-unix))
 
 (defun dev-hooks()
-  "Hooks for dev files"
-  (set-buffer-file-coding-system 'utf-8-unix)
-  (clean-buffer)
+  "Update copyright"
+  (interactive)
+  (iwb)
   (copyright-update))
 
-(defun add-local-dev-hooks()
-  "See dev-hooks"
-  (add-hook 'before-save-hook 'iwb nil t))
+(define-minor-mode pluc-mode
+  "Clean buffers."
+  :lighter " pluc"
+  :global t
+  (if pluc-mode
+      (progn
+        (add-hook 'before-save-hook 'dev-hooks nil t))
+    (remove-hook 'before-save-hook 'dev-hooks t)))
 
-;;; Clean for any files
-(add-hook 'before-save-hook 'clean-buffer)
-;;; For dev
-(add-hook 'c-mode-common-hook 'add-local-dev-hooks)
-(add-hook 'cmake-mode-hook 'add-local-dev-hooks)
+;; Clean for any files
+(add-hook 'before-save-hook 'dtw)
+(add-hook 'prog-mode-hook #'pluc-mode)
 
 ;; Google
 (require 'google-search)
@@ -345,3 +353,11 @@
 ;;           ;; (replace-buffer-in-windows "*compilation*"))
 ;;         ;; Always return the anticipated result of compilation-exit-message-function
 ;;         )))
+
+;; Usage: emacs -diff file1 file2
+(defun command-line-diff (switch)
+  (let ((file1 (pop command-line-args-left))
+        (file2 (pop command-line-args-left)))
+    (diff file1 file2)))
+
+(add-to-list 'command-switch-alist '("diff" . command-line-diff))
