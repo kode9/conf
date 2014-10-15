@@ -58,12 +58,9 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
 
 ;; Theme
-(add-to-list 'load-path '"~/.emacs.d/elpa/color-theme-20080305.34/")
 ;;; Zenburn color theme
-(require 'zenburn)
-(color-theme-zenburn)
+(require 'zenburn-theme)
 ;;; Solarized
-;; (add-to-list 'custom-theme-load-path '"~/usr/src/emacs-color-theme-solarized/")
 ;; (load-theme 'solarized-dark t)
 ;; (load-theme 'solarized-light t)
 
@@ -74,9 +71,6 @@
 ;; Show region size and maximum column number in mode-line
 ;;; http://www.emacswiki.org/emacs/modeline-posn.el
 ;;; Does not work with powerline
-(add-to-list 'load-path '"~/.emacs.d/elpa/modeline-posn-20131227.140/")
-(add-to-list 'load-path '"~/.emacs.d/elpa/modeline-posn-20140121.553/")
-(require 'modeline-posn)
 (set 'modelinepos-column-limit 100)
 
 (defun powerline-pluc-theme ()
@@ -124,30 +118,19 @@
 
 ;; Powerline (custom mode-line)
 ;;; https://github.com/milkypostman/powerline
-(add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20131126.1817/")
-(add-to-list 'load-path '"~/.emacs.d/elpa/powerline-20140516.2128/")
-;(require 'powerline)
-;(powerline-pluc-theme)
+;; (powerline-pluc-theme)
 ;; (powerline-default-theme)
 
 ;; http://www.emacswiki.org/emacs/AutoIndentMode
-(add-to-list 'load-path '"~/.emacs.d/elpa/auto-indent-mode-20131220.1220/")
-(add-to-list 'load-path '"~/.emacs.d/elpa/auto-indent-mode-20140505.655/")
 (setq auto-indent-on-visit-file t)
 (require 'auto-indent-mode)
 (auto-indent-global-mode)
 ;; https://github.com/pmarinov/clean-aindent
-(add-to-list 'load-path '"~/conf/emacs/clean-aindent")
-(require 'clean-aindent)
+(require 'clean-aindent-mode)
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; View, stage and revert Git changes straight from the buffer.
 ;;; https://github.com/nonsequitur/git-gutter-plus
-(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20131230.729")
-(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20140313.1504")
-(add-to-list 'load-path '"~/.emacs.d/elpa/git-commit-mode-20140605.520")
-(add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20130918.435")
-(add-to-list 'load-path '"~/.emacs.d/elpa/git-gutter+-20140205.802")
-(require 'git-gutter+)
 (global-git-gutter+-mode t)
 
 ;; Autoscoll compilation buffer and stop on first error
@@ -157,15 +140,12 @@
 
 ;; Highlights current line in compilation within another buffer
 ;;; Actually it's a bit annoying...
-;; (add-to-list 'load-path '"~/.emacs.d/elpa/fm-20130612.1")
-;; (require 'fm)
 ;; (add-hook 'compilation-mode-hook (lambda () (fm-start)))
 ;; (remove-hook 'compilation-mode-hook (lambda () (fm-start)))
 
 ;; Shorten long file-name targets
 ;;; https://github.com/lewang/scf-mode
 ;;; Seems to work in grep, but not in compile :(
-(add-to-list 'load-path '"~/.emacs.d/elpa/scf-mode-20111202.707/")
 (autoload 'scf-mode "scf-mode" "SCF Mode" t)
 (add-hook 'compilation-mode-hook (lambda () (scf-mode t)))
 
@@ -176,14 +156,11 @@
 
 ;; Major modes
 ;;; Load
-(add-to-list 'load-path '"~/conf/emacs/qml-mode")
-(add-to-list 'load-path '"~/.emacs.d/elpa/haxe-mode")
 (autoload 'glsl-mode "glsl-mode" nil t)
 (autoload 'qml-mode "qml-mode" "QML mode" t)
 (autoload 'markdown-mode "markdown-mode" "Markdown mode" t)
 (autoload 'cmake-mode "cmake-mode" "Cmake Mode." t)
 (autoload 'cuda-mode "cuda-mode" "Cuda Mode." t)
-(add-to-list 'load-path '"~/.emacs.d/elpa/apache-mode-20080905.553/")
 (autoload 'apache-mode "apache-mode" nil t)
 (autoload 'haxe-mode "haxe-mode" "Haxe Mode." t)
 ;;;; Filename patterns
@@ -227,11 +204,6 @@
 ;;; Better SQL indentation
 (eval-after-load "sql" (load-library "sql-indent"))
 ;;; Yasnippet
-(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet")
-(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-0.8.0")
-(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-20131224.143")
-(add-to-list 'load-path "~/.emacs.d/elpa/yasnippet-20140514.1649")
-(require 'yasnippet)
 (yas-global-mode 1)
 ;;; Autocomplete
 ;; ;;;; Andy Stewart init
