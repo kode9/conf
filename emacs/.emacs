@@ -67,17 +67,21 @@
 ;; (load-theme 'solarized-light t)
 
 ;; Identify multiple buffers with the same file name
-(require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
-(require 'ido)
-(setq ido-enable-flex-matching t) ;; activer le fuzzy matching pour trier les résultats
+;; ido (InteractivelyDoThings) better completion for files and buffer, fuzzy matching etc
 (setq ido-everywhere t) ;; activer ido pour find-files et les buffers
+(setq ido-enable-flex-matching t) ;; activer le fuzzy matching pour trier les résultats
+(setq ido-use-filename-at-point 'guess)
+(setq ido-save-directory-list-file "~/.emacs.d/ido.cache")
+(setq ido-enable-last-directory-history t) ; remember last used dirs
+(setq ido-max-work-directory-list 30)   ; should be enough
+(setq ido-max-work-file-list 50)   ; remember many
+(setq ido-confirm-unique-completion t) ; wait for RET, even with unique completion
+(setq confirm-nonexistent-file-or-buffer nil) ;; when using ido, the confirmation is rather annoying...
 (ido-mode 1) ;; activer ido
 
 ;; ido evberywhere
-(add-to-list 'load-path "~/.emacs.d/elpa/ido-ubiquitous")
-(require 'ido-ubiquitous)
 (ido-ubiquitous-mode t)
 ;; Fix ido-ubiquitous for newer packages
 (defmacro ido-ubiquitous-use-new-completing-read (cmd package)
@@ -91,14 +95,11 @@
 (ido-ubiquitous-use-new-completing-read yas/visit-snippet-file 'yasnippet)
 
 ;; ido for meta-x
-(add-to-list 'load-path "~/.emacs.d/elpa/smex")
-(require 'smex)
 (smex-initialize)
 (global-set-key "\M-x" 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 ;; ido recently opened files
-(require 'recentf)
 (setq recentf-max-saved-items 50) ;; fixer le nombre d'enregistrements à 50
 (recentf-mode 1)
 (global-set-key (kbd "C-x C-r") 'ido-recentf-open)
@@ -109,6 +110,68 @@
       (message "Opening file...")
     (message "Aborting")))
 
+;; find-tag using ido
+(defun ido-find-tag ()
+  "Find a tag using ido"
+  (interactive)
+  (visit-tags-table-buffer)
+  (tags-completion-table)
+  (let (tag-names)
+    (mapatoms (lambda (x)
+                (push (prin1-to-string x t) tag-names))
+              tags-completion-table)
+    (find-tag (ido-completing-read "Tag: " tag-names))))
+
+;; find-tag-other-window using ido
+(defun ido-find-tag-other-window ()
+  "Find a tag using ido"
+  (interactive)
+  (visit-tags-table-buffer)
+  (tags-completion-table)
+  (let (tag-names)
+    (mapatoms (lambda (x)
+                (push (prin1-to-string x t) tag-names))
+              tags-completion-table)
+    (find-tag-other-window (ido-completing-read "Tag: " tag-names))))
+
+;; Find files in Tags File
+(defun ido-find-file-in-tags ()
+  (interactive)
+  (save-excursion
+    (let ((enable-recursive-minibuffers t))
+      (visit-tags-table-buffer))
+    (find-file
+     (expand-file-name
+      (ido-completing-read
+       "Project file: " (tags-table-files) nil t)))))
+
+(global-set-key [(control c) (d)] 'ido-find-tag)
+(global-set-key [(control c) (f)] 'ido-find-tag-other-window)
+(global-set-key [(control c) (g)] 'ido-find-file-in-tags)
+
+;; Ibuffer
+(setq ibuffer-saved-filter-groups
+      (quote (("default"
+	       ("dired" (mode . dired-mode))
+               ("ADMS" (filename . "adms/"))
+               ("DEV" (or
+		       (mode . c++-mode)
+		       (mode . c-mode)
+		       (mode . python-mode)))
+               ))))
+
+(add-hook 'ibuffer-mode-hook
+          (lambda ()
+            (ibuffer-switch-to-saved-filter-groups "default")))
+
+(global-set-key (kbd "C-x C-b") 'ibuffer) ;; remplace buffermenu
+
+;; Bookmarks
+(setq bookmark-default-file "~/.emacs.d/bookmarks.cache")
+
+;; windmove: move with alt + arrow
+(windmove-default-keybindings 'super)
+
 ;; Show region size and maximum column number in mode-line
 ;;; http://www.emacswiki.org/emacs/modeline-posn.el
 ;;; Does not work with powerline
@@ -116,7 +179,6 @@
 
 ;; http://www.emacswiki.org/emacs/AutoIndentMode
 (setq auto-indent-on-visit-file t)
-;; (require 'auto-indent-mode)
 (auto-indent-global-mode)
 
 ;; Powerline (custom mode-line)
@@ -169,7 +231,6 @@
 ;; (powerline-default-theme)
 
 ;; https://github.com/pmarinov/clean-aindent
-(require 'clean-aindent-mode)
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; View, stage and revert Git changes straight from the buffer.
@@ -198,8 +259,6 @@
 (compilation-always-kill-mode t)
 
 ;; Color FIXME/TODO/BUG/KLUDGE in comments and strings
-(add-to-list 'load-path '"~/.emacs.d/elpa/fic-mode/")
-(require 'fic-mode)
 (add-hook 'c-mode-common-hook 'turn-on-fic-mode)
 
 ;; Banner comments
@@ -284,7 +343,6 @@
 (yas-global-mode 1)
 
 ;;; Autocomplete
-(require 'auto-complete-config)
 (ac-config-default)
 
 (define-key ac-completing-map (kbd "C-n") 'ac-next)
@@ -387,11 +445,35 @@
 (add-hook 'before-save-hook 'dtw)
 (add-hook 'prog-mode-hook #'pluc-mode)
 
-;; Google
-(require 'google-search)
-;; Set browser to Chromium
+;; Set default browser
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium")
+      browse-url-generic-program "firefox")
+
+;; DuckDuckGo
+(require 'ddg-search) ;; Search functions. Need both ddg (packaged) and ddg-mode
+
+;;; Additional function to search the current region. Copy/paste from google-search.el
+(defvar ddg-search-maxlen 50
+  "Maximum string length of search term.  This prevents you from accidentally
+sending a five megabyte query string to Netscape.")
+
+(defun duckduckgo-region ()
+  "Search the current region on DuckDuckGo."
+  (interactive)
+  (let (start end term url)
+    (if (or (not (fboundp 'region-exists-p)) (region-exists-p))
+        (progn
+          (setq start (region-beginning)
+                end   (region-end))
+          (if (> (- start end) ddg-search-maxlen)
+              (setq term (buffer-substring start (+ start ddg-search-maxlen)))
+            (setq term (buffer-substring start end)))
+          (duckduckgo-web term))
+      (beep)
+      (message "Region not active"))))
+
+(global-set-key [(control c) (control s)] 'duckduckgo-web)
+(global-set-key [(control c) (s)] 'duckduckgo-region)
 
 ;; keys
 (global-set-key [(control c) (c)] 'comment-or-uncomment-region)
@@ -399,10 +481,6 @@
 (global-set-key [(control c) (x)] 'compile)
 (global-set-key [(meta g)] 'goto-line)
 (global-set-key [(control x) (control k)] 'kill-some-buffers)
-(global-set-key [(control c) (control s)] 'google-it)
-(global-set-key [(control c) (s)] 'google-search-selection)
-(global-set-key [(control c) (d)] 'find-tag)
-(global-set-key [(control c) (f)] 'find-tag-other-window)
 
 ;; Close the compilation window if there was no error at all.
 ;; (setq compilation-exit-message-function
