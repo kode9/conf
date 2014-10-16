@@ -13,25 +13,27 @@
 
 ;; Custom variables
 (custom-set-variables
- '(tool-bar-mode nil)                   ; Turn off the toolbar
- '(menu-bar-mode nil)                   ; Turn off the menubar
- '(scroll-bar-mode nil)                 ; Turn off the scrollbar
- '(display-time-mode nil)               ; Do not show date and time
- '(show-paren-mode t)                   ; Highlight parenthesis
- '(mouse-avoidance-mode 'cat-and-mouse) ; Avoid cursor
- '(display-time-mode nil)               ; Hide time in mode-line
- '(line-number-mode t)                  ; Show line number in mode-line
- '(column-number-mode t)                ; Show column number in mode-line
- '(size-indication-mode t)              ; Show buffer size in mode-line
- '(display-battery-mode nil)            ; Hide battery information in mode-line
- '(show-trailing-whitespace t)          ; Trailing whitespaces
- '(python-python-command "python3")     ; Use python3 by default
- '(winner-mode t)                       ; Used for autoclose
- '(display-time-day-and-date)
- '(display-time-24hr-format)
- '(auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
- '(backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
- )
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(auto-save-file-name-transforms (quote ((".*" "~/.emacs.d/autosaves/\\1" t))))
+ '(backup-directory-alist (quote ((".*" . "~/.emacs.d/backups/"))))
+ '(column-number-mode t)
+ '(display-battery-mode nil)
+ '(display-time-24hr-format nil)
+ '(display-time-day-and-date nil)
+ '(display-time-mode nil)
+ '(line-number-mode t)
+ '(menu-bar-mode nil)
+ '(mouse-avoidance-mode (quote cat-and-mouse) nil (avoid))
+ '(python-python-command "python3")
+ '(scroll-bar-mode nil)
+ '(show-paren-mode t)
+ '(show-trailing-whitespace t)
+ '(size-indication-mode t)
+ '(tool-bar-mode nil)
+ '(winner-mode t))
 
 (setq
  inhibit-startup-screen t           ; Do not show the welcome message
@@ -68,63 +70,104 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
+(require 'ido)
+(setq ido-enable-flex-matching t) ;; activer le fuzzy matching pour trier les résultats
+(setq ido-everywhere t) ;; activer ido pour find-files et les buffers
+(ido-mode 1) ;; activer ido
+
+;; ido evberywhere
+(add-to-list 'load-path "~/.emacs.d/elpa/ido-ubiquitous")
+(require 'ido-ubiquitous)
+(ido-ubiquitous-mode t)
+;; Fix ido-ubiquitous for newer packages
+(defmacro ido-ubiquitous-use-new-completing-read (cmd package)
+  `(eval-after-load ,package
+     '(defadvice ,cmd (around ido-ubiquitous-new activate)
+        (let ((ido-ubiquitous-enable-compatibility nil))
+          ad-do-it))))
+
+(ido-ubiquitous-use-new-completing-read webjump 'webjump)
+(ido-ubiquitous-use-new-completing-read yas/expand 'yasnippet)
+(ido-ubiquitous-use-new-completing-read yas/visit-snippet-file 'yasnippet)
+
+;; ido for meta-x
+(add-to-list 'load-path "~/.emacs.d/elpa/smex")
+(require 'smex)
+(smex-initialize)
+(global-set-key "\M-x" 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+;; ido recently opened files
+(require 'recentf)
+(setq recentf-max-saved-items 50) ;; fixer le nombre d'enregistrements à 50
+(recentf-mode 1)
+(global-set-key (kbd "C-x C-r") 'ido-recentf-open)
+(defun ido-recentf-open ()
+  "Use `ido-completing-read' to \[find-file] a recent file"
+  (interactive)
+  (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+      (message "Opening file...")
+    (message "Aborting")))
+
 ;; Show region size and maximum column number in mode-line
 ;;; http://www.emacswiki.org/emacs/modeline-posn.el
 ;;; Does not work with powerline
 (set 'modelinepos-column-limit 100)
 
-(defun powerline-pluc-theme ()
-  "Setup the default mode-line."
-  (interactive)
-  (setq-default mode-line-format
-                '("%e"
-                  (:eval
-                   (let* ((active (powerline-selected-window-active))
-                          (mode-line (if active 'mode-line 'mode-line-inactive))
-                          (face1 (if active 'powerline-active1 'powerline-inactive1))
-                          (face2 (if active 'powerline-active2 'powerline-inactive2))
-                          (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
-                                                          (car powerline-default-separator-dir))))
-                          (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
-                                                           (cdr powerline-default-separator-dir))))
-                          (lhs (list (powerline-buffer-id nil 'l)
-                                     (when (and (boundp 'which-func-mode) which-func-mode)
-                                       (powerline-raw which-func-format nil 'l))
-                                     (powerline-raw " ")
-                                     (funcall separator-left mode-line face1)
-                                     (when (boundp 'erc-modified-channels-object)
-                                       (powerline-raw erc-modified-channels-object face1 'l))
-                                     (funcall separator-left face1 face2)
-                                     (powerline-raw "%l ϟ %c" face2 'l)
-                                     (funcall separator-left face2 face1)
-                                     (powerline-major-mode face1 'l)
-                                     (powerline-process face1)
-                                     (powerline-minor-modes face1 'l)
-                                     (powerline-narrow face1 'l)
-                                     (powerline-raw " " face1)
-                                     (funcall separator-left face1 face2)
-                                     (powerline-vc face2 'r)))
-                          (rhs (list (powerline-raw global-mode-string face2 'r)
-                                     (funcall separator-right face2 face1)
-                                     (funcall separator-right face1 mode-line)
-                                     (powerline-raw " ")
-                                     (powerline-raw "%6p" nil 'r)
-                                     (powerline-hud face2 face1))))
-                     (concat (powerline-render lhs)
-                             (powerline-fill face2 (powerline-width rhs))
-                             (powerline-render rhs)))))))
+;; http://www.emacswiki.org/emacs/AutoIndentMode
+(setq auto-indent-on-visit-file t)
+;; (require 'auto-indent-mode)
+(auto-indent-global-mode)
 
 ;; Powerline (custom mode-line)
 ;;; https://github.com/milkypostman/powerline
+
+;; (defun powerline-pluc-theme ()
+;;   "Setup the default mode-line."
+;;   (interactive)
+;;   (setq-default mode-line-format
+;;                 '("%e"
+;;                   (:eval
+;;                    (let* ((active (powerline-selected-window-active))
+;;                           (mode-line (if active 'mode-line 'mode-line-inactive))
+;;                           (face1 (if active 'powerline-active1 'powerline-inactive1))
+;;                           (face2 (if active 'powerline-active2 'powerline-inactive2))
+;;                           (separator-left (intern (format "powerline-%s-%s"
+;;                                                           powerline-default-separator
+;;                                                           (car powerline-default-separator-dir))))
+;;                           (separator-right (intern (format "powerline-%s-%s"
+;;                                                            powerline-default-separator
+;;                                                            (cdr powerline-default-separator-dir))))
+;;                           (lhs (list (powerline-buffer-id nil 'l)
+;;                                      (when (and (boundp 'which-func-mode) which-func-mode)
+;;                                        (powerline-raw which-func-format nil 'l))
+;;                                      (powerline-raw " ")
+;;                                      (funcall separator-left mode-line face1)
+;;                                      (when (boundp 'erc-modified-channels-object)
+;;                                        (powerline-raw erc-modified-channels-object face1 'l))
+;;                                      (funcall separator-left face1 face2)
+;;                                      (powerline-raw "%l ϟ %c" face2 'l)
+;;                                      (funcall separator-left face2 face1)
+;;                                      (powerline-major-mode face1 'l)
+;;                                      (powerline-process face1)
+;;                                      (powerline-minor-modes face1 'l)
+;;                                      (powerline-narrow face1 'l)
+;;                                      (powerline-raw " " face1)
+;;                                      (funcall separator-left face1 face2)
+;;                                      (powerline-vc face2 'r)))
+;;                           (rhs (list (powerline-raw global-mode-string face2 'r)
+;;                                      (funcall separator-right face2 face1)
+;;                                      (funcall separator-right face1 mode-line)
+;;                                      (powerline-raw " ")
+;;                                      (powerline-raw "%6p" nil 'r)
+;;                                      (powerline-hud face2 face1))))
+;;                      (concat (powerline-render lhs)
+;;                              (powerline-fill face2 (powerline-width rhs))
+;;                              (powerline-render rhs)))))))
+
 ;; (powerline-pluc-theme)
 ;; (powerline-default-theme)
 
-;; http://www.emacswiki.org/emacs/AutoIndentMode
-(setq auto-indent-on-visit-file t)
-(require 'auto-indent-mode)
-(auto-indent-global-mode)
 ;; https://github.com/pmarinov/clean-aindent
 (require 'clean-aindent-mode)
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -151,8 +194,38 @@
 
 ;; Stop asking yes/no before compile when a compilation is already running
 ;;; ftp://download.tuxfamily.org/user42/compilation-always-kill.el
-(autoload 'compilation-always-kill-mode "compilation-always-kill" nil t)
+(autoload 'compilation-always-kill-mode "compilation-always-kill" "Compilation kill" t)
 (compilation-always-kill-mode t)
+
+;; Color FIXME/TODO/BUG/KLUDGE in comments and strings
+(add-to-list 'load-path '"~/.emacs.d/elpa/fic-mode/")
+(require 'fic-mode)
+(add-hook 'c-mode-common-hook 'turn-on-fic-mode)
+
+;; Banner comments
+(autoload 'line-comment-banner "line-comment-banner" "Comment banner" t)
+(global-set-key [(control c) (b)] (lambda () (interactive) (line-comment-banner 80)))
+
+;; Various debug function
+;;; http://www.cbrunzema.de/download/ll-debug/ll-debug.el
+;; (require 'll-debug)
+;; ;;; Comment a region and keep a copy
+;; (global-set-key [(control c) (w)] 'll-debug-copy-and-comment-region-or-line)
+
+;; Space around operators
+;; (add-to-list 'load-path '"~/.emacs.d/elpa/smart-operator-20051013.1756/")
+;; (require 'smart-operator)
+;; (defun smart-operator-c-hook ()
+;;   (smart-insert-operator-hook)
+;;   (local-unset-key (kbd "."))
+;;   (local-unset-key (kbd ":"))
+;;   (local-unset-key (kbd "!"))
+;;   (local-unset-key (kbd "<"))
+;;   (local-unset-key (kbd ">"))
+;;   (local-unset-key (kbd "/"))
+;;   (local-unset-key (kbd "-"))
+;;   (local-set-key (kbd "*") 'c-electric-star))
+;; (add-hook 'c-mode-common-hook 'smart-operator-c-hook)
 
 ;; Major modes
 ;;; Load
@@ -163,6 +236,7 @@
 (autoload 'cuda-mode "cuda-mode" "Cuda Mode." t)
 (autoload 'apache-mode "apache-mode" nil t)
 (autoload 'haxe-mode "haxe-mode" "Haxe Mode." t)
+(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
 ;;;; Filename patterns
 (add-to-list 'auto-mode-alist '("\\.qml\\'" . qml-mode))
 (add-to-list 'auto-mode-alist '("\\.\\(markdown\\|md\\|mdwn\\|mdml\\)\\'" . markdown-mode))
@@ -181,7 +255,7 @@
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . shell-script-mode))
 (add-to-list 'auto-mode-alist '("\\.xrdb\\'" . conf-xdefaults-mode))
 (add-to-list 'auto-mode-alist '(".*_EDITMSG\\'" . log-entry-mode)) ; Git commit
-(add-to-list 'auto-mode-alist '("\\.\\(glsl\\|vert\\|frag\\|geom\\|vs\\|fs\\|gs\\)\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(glsl\\|vert\\|frag\\|geom\\|vs\\|ksh\\|fs\\|gs\\)\\'" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.cu\\'" . cuda-mode))
 (add-to-list 'auto-mode-alist '("\\.htaccess\\'"   . apache-mode))
 (add-to-list 'auto-mode-alist '("httpd\\.conf\\'"  . apache-mode))
@@ -190,6 +264,8 @@
 (add-to-list 'auto-mode-alist '("sites-\\(available\\|enabled\\)/" . apache-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\.lk\\'" . js-mode)) ; LeekScript (LeekWars)
 (add-to-list 'auto-mode-alist '("\\.hx\\'" . haxe-mode))
+(add-to-list 'auto-mode-alist '("PKGBUILD\\'" . sh-mode))
+(add-to-list 'auto-mode-alist '("\\.lua\\'" . lua-mode))
 
 ;; Minor modes
 (autoload 'align-string "align-string" "Align string." t)
@@ -201,11 +277,25 @@
   (if (file-exists-p "CMakeLists.txt") (cmake-project-mode)))
 (add-hook 'c-mode-hook 'maybe-cmake-project-hook)
 (add-hook 'c++-mode-hook 'maybe-cmake-project-hook)
+
 ;;; Better SQL indentation
 (eval-after-load "sql" (load-library "sql-indent"))
 ;;; Yasnippet
 (yas-global-mode 1)
+
 ;;; Autocomplete
+(require 'auto-complete-config)
+(ac-config-default)
+
+(define-key ac-completing-map (kbd "C-n") 'ac-next)
+(define-key ac-completing-map (kbd "C-p") 'ac-previous)
+
+;;; set the trigger key so that it can work together with yasnippet on tab key,
+;;; if the word exists in yasnippet, pressing tab will cause yasnippet to
+;;; activate, otherwise, auto-complete will
+(ac-set-trigger-key "TAB")
+(ac-set-trigger-key "<tab>")
+
 ;; ;;;; Andy Stewart init
 ;; (require 'init-auto-complete)
 ;; ; default init
